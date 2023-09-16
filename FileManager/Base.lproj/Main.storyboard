@@ -1,24 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Oze-UV-bCK">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Navigation Controller-->
+        <scene sceneID="qTA-gr-fo9">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Oze-UV-bCK" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="8RW-qq-6xJ">
+                        <rect key="frame" x="0.0" y="59" width="393" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="YVj-r2-xRh"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yNs-pn-7nF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-16" y="-366"/>
+        </scene>
+        <!--Documents-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DocumentsViewController" id="BYZ-38-t0r" customClass="DocumentsViewController" customModule="FileManager" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="50" estimatedSectionHeaderHeight="-1" sectionFooterHeight="10" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="BUd-qC-AdC">
+                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="DocumentsTableViewCell" id="ktN-Pq-Lvz">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ktN-Pq-Lvz" id="6fa-G4-cmQ">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="hTT-Ho-yLU" kind="show" identifier="openFirstLevelFolder" id="aSV-FX-Jbc"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <sections/>
+                            </tableView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="BUd-qC-AdC" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="1fw-hy-BdK"/>
+                            <constraint firstItem="BUd-qC-AdC" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="3bM-rV-uR4"/>
+                            <constraint firstItem="BUd-qC-AdC" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="JUL-3l-wEU"/>
+                            <constraint firstItem="BUd-qC-AdC" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="hAV-F5-HhF"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Documents" customizationIdentifier="" id="IuF-6N-X6w">
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="AKe-Pc-Nvt">
+                                <connections>
+                                    <action selector="addImage:" destination="BYZ-38-t0r" id="rra-uI-azb"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="folder.badge.plus" catalog="system" id="PW2-Xr-H0z">
+                                <connections>
+                                    <action selector="createNewFolder:" destination="BYZ-38-t0r" id="Abu-u7-PUa"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="BUd-qC-AdC" id="ohh-AN-gaC"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="720" y="-366"/>
+        </scene>
+        <!--Folder-->
+        <scene sceneID="bGe-Cw-qfM">
+            <objects>
+                <viewController storyboardIdentifier="FirstLevelFolderViewControllerViewController" id="hTT-Ho-yLU" customClass="FirstLevelFolderViewControllerViewController" customModule="FileManager" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="JUI-dg-bYc">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="MHi-93-gdQ">
+                                <rect key="frame" x="0.0" y="155" width="393" height="663"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FirstLevelFolderCell" id="Zn5-Jp-QgI">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Zn5-Jp-QgI" id="hDO-i6-cWZ">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="aFQ-J3-7qG" kind="show" identifier="openSecondLevelFolder" id="jgS-Un-Mji"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="G05-aw-cEs"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="MHi-93-gdQ" firstAttribute="leading" secondItem="G05-aw-cEs" secondAttribute="leading" id="6D5-gE-bB2"/>
+                            <constraint firstItem="MHi-93-gdQ" firstAttribute="bottom" secondItem="G05-aw-cEs" secondAttribute="bottom" id="WX8-zB-LBd"/>
+                            <constraint firstItem="MHi-93-gdQ" firstAttribute="trailing" secondItem="G05-aw-cEs" secondAttribute="trailing" id="s04-SF-N2R"/>
+                            <constraint firstItem="MHi-93-gdQ" firstAttribute="top" secondItem="G05-aw-cEs" secondAttribute="top" id="tim-6a-4af"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Folder" id="fOx-RY-vQE">
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="6HP-5y-ZfI">
+                                <connections>
+                                    <action selector="addImage:" destination="hTT-Ho-yLU" id="rMl-7a-VNr"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="folder.badge.plus" catalog="system" id="iTc-hy-y6o">
+                                <connections>
+                                    <action selector="createNewFolder:" destination="hTT-Ho-yLU" id="2QC-xC-Kz6"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="MHi-93-gdQ" id="38j-IY-1Az"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5yU-1T-GA6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1442" y="-304"/>
+        </scene>
+        <!--One more folder-->
+        <scene sceneID="dxh-K5-qkE">
+            <objects>
+                <viewController storyboardIdentifier="SecondLevelFolderViewController" id="aFQ-J3-7qG" customClass="SecondLevelFolderViewController" customModule="FileManager" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="gHG-03-ocH">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Apq-eA-2pV">
+                                <rect key="frame" x="0.0" y="155" width="393" height="663"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SecondLevelFolderCell" id="cw0-oB-ILR">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cw0-oB-ILR" id="CEd-Mc-5ku">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="JVh-0U-upz"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Apq-eA-2pV" firstAttribute="trailing" secondItem="JVh-0U-upz" secondAttribute="trailing" id="8zQ-Lc-xJL"/>
+                            <constraint firstItem="Apq-eA-2pV" firstAttribute="top" secondItem="JVh-0U-upz" secondAttribute="top" id="LRT-pQ-FdN"/>
+                            <constraint firstItem="Apq-eA-2pV" firstAttribute="leading" secondItem="JVh-0U-upz" secondAttribute="leading" id="Qw1-t5-qH8"/>
+                            <constraint firstItem="Apq-eA-2pV" firstAttribute="bottom" secondItem="JVh-0U-upz" secondAttribute="bottom" id="cq3-61-fJE"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="One more folder" id="ctN-XV-VRG">
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="qh3-n4-U7R">
+                                <connections>
+                                    <action selector="addImage:" destination="aFQ-J3-7qG" id="Y4a-Hn-yoK"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem enabled="NO" image="folder.badge.plus" catalog="system" id="Spy-VU-inH">
+                                <connections>
+                                    <action selector="createNewFolder:" destination="aFQ-J3-7qG" id="nnd-vT-NRO"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="Apq-eA-2pV" id="PC1-CB-Wm9"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5Hj-cl-CB5" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2158" y="-199"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="folder.badge.plus" catalog="system" width="128" height="92"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
