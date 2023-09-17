@@ -49,7 +49,6 @@ class DocumentsViewController: UIViewController {
         }
     }
     
-    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -118,7 +117,6 @@ class DocumentsViewController: UIViewController {
         }
     }
 }
-
 
 
 extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
