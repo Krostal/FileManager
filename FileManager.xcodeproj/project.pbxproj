@@ -43,6 +43,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0911C28D2AB6E15B0031E9DF /* FileManager */ = {
+			isa = PBXGroup;
+			children = (
+				09A54AF82AB58455003331D4 /* FileManagerService.swift */,
+				09A54AF42AB56D5D003331D4 /* DocumentsViewController.swift */,
+				09A54AFA2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift */,
+				0911C28B2AB5C4C20031E9DF /* SecondLevelFolderViewController.swift */,
+			);
+			path = FileManager;
+			sourceTree = "<group>";
+		};
 		09F425442AB5578C00C294D9 = {
 			isa = PBXGroup;
 			children = (
@@ -62,16 +73,13 @@
 		09F4254F2AB5578C00C294D9 /* FileManager */ = {
 			isa = PBXGroup;
 			children = (
+				0911C28D2AB6E15B0031E9DF /* FileManager */,
 				09F425502AB5578C00C294D9 /* AppDelegate.swift */,
 				09F425522AB5578C00C294D9 /* SceneDelegate.swift */,
 				09F425562AB5578C00C294D9 /* Main.storyboard */,
 				09F425592AB5578D00C294D9 /* Assets.xcassets */,
 				09F4255B2AB5578D00C294D9 /* LaunchScreen.storyboard */,
 				09F4255E2AB5578D00C294D9 /* Info.plist */,
-				09A54AF82AB58455003331D4 /* FileManagerService.swift */,
-				09A54AF42AB56D5D003331D4 /* DocumentsViewController.swift */,
-				09A54AFA2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift */,
-				0911C28B2AB5C4C20031E9DF /* SecondLevelFolderViewController.swift */,
 			);
 			path = FileManager;
 			sourceTree = "<group>";

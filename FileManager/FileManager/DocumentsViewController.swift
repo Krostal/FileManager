@@ -48,7 +48,7 @@ class DocumentsViewController: UIViewController {
             }
         }
     }
-
+    
     
     private func setupTableView() {
         tableView.delegate = self
@@ -61,6 +61,41 @@ class DocumentsViewController: UIViewController {
         tableView.reloadData()
     }
     
+    private func showAlert() {
+        let folderNameAlert = UIAlertController(title: "Create new folder", message: "Enter folder name ", preferredStyle: .alert)
+        
+        folderNameAlert.addTextField { textField in
+            textField.placeholder = "Folder name"
+        }
+        
+        folderNameAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        folderNameAlert.addAction(UIAlertAction(title: "Create", style: .default, handler: { [weak self, weak folderNameAlert] _ in
+            guard let self else { return }
+            guard let alert = folderNameAlert else { return }
+            if let folderName = alert.textFields?.first?.text {
+                let allowedCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+                let folderNameCharacterSet = CharacterSet(charactersIn: folderName)
+                if folderName.isEmpty || !allowedCharacterSet.isSuperset(of: folderNameCharacterSet) {
+                    let errorAlert = UIAlertController(title: "Ошибка", message: "Folder name contains invalid characters", preferredStyle: .alert)
+                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                        self.showAlert()
+                    }))
+                    present(errorAlert, animated: true)
+                } else {
+                    fileManagerService.createDirectory(inParentDirectory: documentsURL, withName: folderName)
+                    updateTableView()
+                }
+            }
+        }))
+        present(folderNameAlert, animated: true)
+    }
+    
+    private func swipeForEdit() {
+        let swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture))
+        swipeGestureRecognizer.direction = .left
+        tableView.addGestureRecognizer(swipeGestureRecognizer)
+    }
+    
     
     @IBAction func addImage(_ sender: UIBarButtonItem) {
         let imagePicker = UIImagePickerController()
@@ -70,24 +105,20 @@ class DocumentsViewController: UIViewController {
     }
     
     @IBAction func createNewFolder(_ sender: UIBarButtonItem) {
-        let alert = UIAlertController(title: "Создать папку", message: "Введите название папки", preferredStyle: .alert)
-        
-        alert.addTextField { textField in
-            textField.placeholder = "Название папки"
-        }
-        
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Создать", style: .default, handler: { [weak self, weak alert] _ in
-            guard let self else { return }
-            guard let alert = alert else { return }
-            if let folderName = alert.textFields?.first?.text {
-                fileManagerService.createDirectory(inParentDirectory: documentsURL, withName: folderName)
-                updateTableView()
+        showAlert()
+    }
+    
+    @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        if gestureRecognizer.state == .recognized {
+            if tableView.isEditing {
+                tableView.setEditing(false, animated: true)
+            } else {
+                tableView.setEditing(true, animated: true)
             }
-        }))
-        present(alert, animated: true)
+        }
     }
 }
+
 
 
 extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
@@ -113,6 +144,15 @@ extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let content = contentOfDocuments[indexPath.row]
+            let folderPath = documentsURL.appendingPathComponent(content.name).path
+            fileManagerService.removeContent(atPath: folderPath)
+            updateTableView()
+        }
     }
 }
 

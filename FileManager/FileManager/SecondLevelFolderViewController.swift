@@ -19,7 +19,6 @@ class SecondLevelFolderViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         contentOfFolder = fileManagerService.contentsOfDirectory(fromURL: URL(filePath: folderPath))
-        print(contentOfFolder, folderPath)
     }
     
     private func updateTableView() {
@@ -27,11 +26,27 @@ class SecondLevelFolderViewController: UIViewController {
         tableView.reloadData()
     }
     
+    private func swipeForEdit() {
+        let swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture))
+        swipeGestureRecognizer.direction = .left
+        tableView.addGestureRecognizer(swipeGestureRecognizer)
+    }
+    
     @IBAction func addImage(_ sender: UIBarButtonItem) {
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
         present(imagePicker, animated: true, completion: nil)
+    }
+    
+    @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        if gestureRecognizer.state == .recognized {
+            if tableView.isEditing {
+                tableView.setEditing(false, animated: true)
+            } else {
+                tableView.setEditing(true, animated: true)
+            }
+        }
     }
 }
 
@@ -58,6 +73,15 @@ extension SecondLevelFolderViewController: UITableViewDelegate, UITableViewDataS
         }
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let content = contentOfFolder[indexPath.row]
+            let folderPath = URL(filePath: folderPath).appendingPathComponent(content.name).path
+            fileManagerService.removeContent(atPath: folderPath)
+            updateTableView()
+        }
     }
 }
 
