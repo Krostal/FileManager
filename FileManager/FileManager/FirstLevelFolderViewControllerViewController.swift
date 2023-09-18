@@ -40,7 +40,6 @@ class FirstLevelFolderViewControllerViewController: UIViewController {
         }
     }
     
-    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
