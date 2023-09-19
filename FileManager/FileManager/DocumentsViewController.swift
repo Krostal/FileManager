@@ -5,6 +5,10 @@ class DocumentsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
+    private var isSortingEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: "isSortingEnabled")
+    }
+    
     var fileManagerService = FileManagerService()
     
     var contentOfDocuments: [Content] = []
@@ -22,6 +26,16 @@ class DocumentsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if isSortingEnabled {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
+        tableView.reloadData()
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
@@ -53,15 +67,26 @@ class DocumentsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         contentOfDocuments = fileManagerService.contentsOfDirectory(fromURL: documentsURL)
+        if isSortingEnabled {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
+        print(contentOfDocuments)
     }
     
     private func updateTableView() {
         contentOfDocuments = fileManagerService.contentsOfDirectory(fromURL: documentsURL)
+        if isSortingEnabled {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
         tableView.reloadData()
     }
     
-    private func showAlert() {
-        let folderNameAlert = UIAlertController(title: "Create new folder", message: "Enter folder name ", preferredStyle: .alert)
+    private func showFolderAlert() {
+        let folderNameAlert = UIAlertController(title: "Create new folder", message: "Enter folder name", preferredStyle: .alert)
         
         folderNameAlert.addTextField { textField in
             textField.placeholder = "Folder name"
@@ -75,9 +100,9 @@ class DocumentsViewController: UIViewController {
                 let allowedCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
                 let folderNameCharacterSet = CharacterSet(charactersIn: folderName)
                 if folderName.isEmpty || !allowedCharacterSet.isSuperset(of: folderNameCharacterSet) {
-                    let errorAlert = UIAlertController(title: "Ошибка", message: "Folder name contains invalid characters", preferredStyle: .alert)
+                    let errorAlert = UIAlertController(title: "Error", message: "Folder name contains invalid characters", preferredStyle: .alert)
                     errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-                        self.showAlert()
+                        self.showFolderAlert()
                     }))
                     present(errorAlert, animated: true)
                 } else {
@@ -104,7 +129,7 @@ class DocumentsViewController: UIViewController {
     }
     
     @IBAction func createNewFolder(_ sender: UIBarButtonItem) {
-        showAlert()
+        showFolderAlert()
     }
     
     @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
@@ -133,6 +158,7 @@ extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DocumentsTableViewCell", for: indexPath)
         
         let content = contentOfDocuments[indexPath.row]
+        
         cell.textLabel?.text = content.name
             
         if content.type == .folder {

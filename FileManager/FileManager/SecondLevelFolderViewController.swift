@@ -4,6 +4,11 @@ import UIKit
 class SecondLevelFolderViewController: UIViewController {
     
     private lazy var fileManagerService = FileManagerService()
+    
+    private var isSortingEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: "isSortingEnabled")
+    }
+    
     var contentOfFolder: [Content] = []
     
     var folderPath: String = ""
@@ -15,14 +20,34 @@ class SecondLevelFolderViewController: UIViewController {
         setupTableView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if isSortingEnabled {
+            contentOfFolder = contentOfFolder.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfFolder = contentOfFolder.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
+        tableView.reloadData()
+    }
+    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
         contentOfFolder = fileManagerService.contentsOfDirectory(fromURL: URL(filePath: folderPath))
+        if isSortingEnabled {
+            contentOfFolder = contentOfFolder.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfFolder = contentOfFolder.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
     }
     
     private func updateTableView() {
         contentOfFolder = fileManagerService.contentsOfDirectory(fromURL: URL(filePath: folderPath))
+        if isSortingEnabled {
+            contentOfFolder = contentOfFolder.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfFolder = contentOfFolder.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
         tableView.reloadData()
     }
     

@@ -8,11 +8,9 @@ class AuthorizationViewController: UIViewController {
         case repeatPassword
     }
     
-    var hasPassword: Bool = false
-    var passwordIsValid: Bool = false
+    private let keychainService = KeychainService()
     
-    var firstPassword: String = ""
-    var secondPassword: String = ""
+    var passwordsMatch: Bool = false
     
     var buttonState: ButtonState = .createPassword
     
@@ -37,13 +35,19 @@ class AuthorizationViewController: UIViewController {
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         if identifier == "showTabBar" {
-            return passwordIsValid
+            return passwordsMatch
         }
         return false
     }
     
     private func setupView() {
-        titleLabel.text = "Has password: \(hasPassword)"
+        if keychainService.isPasswordExists {
+            buttonState = .enterPassword
+            titleLabel.text = "Enter your current password"
+        } else {
+            buttonState = .createPassword
+            titleLabel.text = "Create new password"
+        }
         updateButtonTitle()
     }
     
@@ -52,49 +56,65 @@ class AuthorizationViewController: UIViewController {
         case .createPassword:
             signInButton.setTitle("Create a password", for: .normal)
             passwordTextField.placeholder = "Create new password"
+            passwordTextField.text = ""
         case .enterPassword:
             signInButton.setTitle("Enter password", for: .normal)
             passwordTextField.placeholder = "Enter your password"
+            passwordTextField.text = ""
         case .repeatPassword:
             signInButton.setTitle("Repeat password", for: .normal)
             passwordTextField.placeholder = "Repeat your password"
+            passwordTextField.text = ""
         }
     }
     
-    private func showAlert(title: String, message: String) {
+    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { [weak self] _ in
             guard let self else { return }
             self.dismiss(animated: true)
+            completion()
         }))
         present(alert, animated: true)
     }
     
-    private func createPassword() {
-        if let newPassword = passwordTextField.text {
-            firstPassword = newPassword
-        }
-        if firstPassword.count > 3 {
-            buttonState = .repeatPassword
-            updateButtonTitle()
-            passwordTextField.text = ""
+    private func enterPassword() {
+        guard let enteredPassword = passwordTextField.text else { return }
+        if enteredPassword.count > 3 {
+            if keychainService.checkPassword(enteredPassword) {
+                passwordsMatch = true
+            } else {
+                showAlert(title: "Error", message: "Incorrect password, try again")
+            }
         } else {
             showAlert(title: "Error", message: "Password must contain at least 4 characters")
         }
     }
     
-    private func enterPassword() {
+    private func createPassword() {
+        guard let newPassword = passwordTextField.text else { return }
+        if newPassword.count > 3 {
+            keychainService.saveTemporaryPassword(newPassword)
+            self.buttonState = .repeatPassword
+            updateButtonTitle()
+        } else {
+            showAlert(title: "Error", message: "Password must contain at least 4 characters")
+        }
     }
     
-    
     private func repeatPassword() {
-        if let repeatedText = passwordTextField.text {
-            secondPassword = repeatedText
-        }
-        if secondPassword == firstPassword {
-            passwordIsValid = true
+        guard let repeatedText = passwordTextField.text else { return }
+        if keychainService.checkTemporaryPassword(repeatedText) {
+            keychainService.savePassword(repeatedText)
+            keychainService.deleteTemporaryPassword()
+            passwordsMatch = true
         } else {
-            showAlert(title: "Error", message: "Passwords do not match")
+            keychainService.deleteTemporaryPassword()
+            showAlert(title: "Error", message: "Passwords do not match") { [weak self] in
+                guard let self else { return }
+                self.buttonState = .createPassword
+                self.updateButtonTitle()
+            }
         }
     }
     
