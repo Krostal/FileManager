@@ -93,8 +93,21 @@ extension SecondLevelFolderViewController: UITableViewDelegate, UITableViewDataS
         
         if content.type == .folder {
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = nil
         } else {
             cell.accessoryType = .none
+            if let imageName = content.imageName {
+                let imagePath = URL(filePath: folderPath).appending(path: imageName)
+                do {
+                    let imageData = try Data(contentsOf: imagePath)
+                    let image = UIImage(data: imageData)
+                    let imageView = UIImageView(image: image)
+                    imageView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+                    cell.accessoryView = imageView
+                } catch {
+                    print("❌", error.localizedDescription)
+                }
+            }
         }
         
         return cell
@@ -112,14 +125,20 @@ extension SecondLevelFolderViewController: UITableViewDelegate, UITableViewDataS
 
 extension SecondLevelFolderViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage,
-           let imageURL = info[.imageURL] as? URL {
-            let imageName = imageURL.lastPathComponent
-            if let imageData = image.jpegData(compressionQuality: 1.0) {
-                fileManagerService.createFile(inParentDirectory: URL(filePath: folderPath), data: imageData, imageName: imageName)
-            }
+        picker.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            Alert().setName(
+                on: self,
+                title: "Save Image",
+                message: "Enter a name for the image",
+                placeholder: "Image name") { enteredName in
+                    guard let name = enteredName else { return }
+                    if let image = info[.originalImage] as? UIImage,
+                       let imageData = image.jpegData(compressionQuality: 1.0) {
+                        self.fileManagerService.createFile(inParentDirectory: URL(filePath: self.folderPath), data: imageData, imageName: name + ".jpeg")
+                        self.updateTableView()
+                    }
+                }
         }
-        updateTableView()
-        picker.dismiss(animated: true, completion: nil)
     }
 }

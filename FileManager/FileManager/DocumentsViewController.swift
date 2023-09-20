@@ -146,8 +146,21 @@ extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
             
         if content.type == .folder {
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = nil
         } else {
             cell.accessoryType = .none
+            if let imageName = content.imageName {
+                let imagePath = documentsURL.appending(path: imageName)
+                do {
+                    let imageData = try Data(contentsOf: imagePath)
+                    let image = UIImage(data: imageData)
+                    let imageView = UIImageView(image: image)
+                    imageView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+                    cell.accessoryView = imageView
+                } catch {
+                    print("❌", error.localizedDescription)
+                }
+            }
         }
         
         return cell

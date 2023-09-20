@@ -82,35 +82,6 @@ class FirstLevelFolderViewControllerViewController: UIViewController {
         tableView.addGestureRecognizer(swipeGestureRecognizer)
     }
     
-    private func showAlert() {
-        let folderNameAlert = UIAlertController(title: "Create new folder", message: "Enter folder name ", preferredStyle: .alert)
-        
-        folderNameAlert.addTextField { textField in
-            textField.placeholder = "Folder name"
-        }
-        
-        folderNameAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        folderNameAlert.addAction(UIAlertAction(title: "Create", style: .default, handler: { [weak self, weak folderNameAlert] _ in
-            guard let self else { return }
-            guard let alert = folderNameAlert else { return }
-            if let folderName = alert.textFields?.first?.text {
-                let allowedCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
-                let folderNameCharacterSet = CharacterSet(charactersIn: folderName)
-                if folderName.isEmpty || !allowedCharacterSet.isSuperset(of: folderNameCharacterSet) {
-                    let errorAlert = UIAlertController(title: "Ошибка", message: "Folder name contains invalid characters", preferredStyle: .alert)
-                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-                        self.showAlert()
-                    }))
-                    present(errorAlert, animated: true)
-                } else {
-                    fileManagerService.createDirectory(inParentDirectory: URL(filePath: folderPath), withName: folderName)
-                    updateTableView()
-                }
-            }
-        }))
-        present(folderNameAlert, animated: true)
-    }
-    
     @IBAction func addImage(_ sender: UIBarButtonItem) {
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
@@ -119,7 +90,19 @@ class FirstLevelFolderViewControllerViewController: UIViewController {
     }
     
     @IBAction func createNewFolder(_ sender: UIBarButtonItem) {
-        showAlert()
+        Alert().setName(
+            on: self,
+            title: "Create new folder",
+            message: "Enter folder name",
+            placeholder: "Folder name"
+        ) {
+            [weak self] enteredName in
+            guard let self else { return }
+            if let name = enteredName {
+                self.fileManagerService.createDirectory(inParentDirectory: URL(filePath: self.folderPath), withName: name)
+                self.updateTableView()
+            }
+        }
     }
     
     @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
@@ -151,8 +134,21 @@ extension FirstLevelFolderViewControllerViewController: UITableViewDelegate, UIT
         
         if content.type == .folder {
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = nil
         } else {
             cell.accessoryType = .none
+            if let imageName = content.imageName {
+                let imagePath = URL(filePath: folderPath).appending(path: imageName)
+                do {
+                    let imageData = try Data(contentsOf: imagePath)
+                    let image = UIImage(data: imageData)
+                    let imageView = UIImageView(image: image)
+                    imageView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+                    cell.accessoryView = imageView
+                } catch {
+                    print("❌", error.localizedDescription)
+                }
+            }
         }
         
         return cell
@@ -171,15 +167,21 @@ extension FirstLevelFolderViewControllerViewController: UITableViewDelegate, UIT
 
 extension FirstLevelFolderViewControllerViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage,
-           let imageURL = info[.imageURL] as? URL {
-            let imageName = imageURL.lastPathComponent
-            if let imageData = image.jpegData(compressionQuality: 1.0) {
-                fileManagerService.createFile(inParentDirectory: URL(filePath: folderPath), data: imageData, imageName: imageName)
-            }
+        picker.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            Alert().setName(
+                on: self,
+                title: "Save Image",
+                message: "Enter a name for the image",
+                placeholder: "Image name") { enteredName in
+                    guard let name = enteredName else { return }
+                    if let image = info[.originalImage] as? UIImage,
+                       let imageData = image.jpegData(compressionQuality: 1.0) {
+                        self.fileManagerService.createFile(inParentDirectory: URL(filePath: self.folderPath), data: imageData, imageName: name + ".jpeg")
+                        self.updateTableView()
+                    }
+                }
         }
-        updateTableView()
-        picker.dismiss(animated: true, completion: nil)
     }
 }
 
