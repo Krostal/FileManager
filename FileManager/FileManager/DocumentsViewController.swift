@@ -5,6 +5,10 @@ class DocumentsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
+    private var isSortingEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: "isSortingEnabled")
+    }
+    
     var fileManagerService = FileManagerService()
     
     var contentOfDocuments: [Content] = []
@@ -22,6 +26,16 @@ class DocumentsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if isSortingEnabled {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
+        tableView.reloadData()
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
@@ -53,40 +67,22 @@ class DocumentsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         contentOfDocuments = fileManagerService.contentsOfDirectory(fromURL: documentsURL)
+        if isSortingEnabled {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() > $1.name.lowercased() }
+        }
+        print(contentOfDocuments)
     }
     
     private func updateTableView() {
         contentOfDocuments = fileManagerService.contentsOfDirectory(fromURL: documentsURL)
-        tableView.reloadData()
-    }
-    
-    private func showAlert() {
-        let folderNameAlert = UIAlertController(title: "Create new folder", message: "Enter folder name ", preferredStyle: .alert)
-        
-        folderNameAlert.addTextField { textField in
-            textField.placeholder = "Folder name"
+        if isSortingEnabled {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        } else {
+            contentOfDocuments = contentOfDocuments.sorted { $0.name.lowercased() > $1.name.lowercased() }
         }
-        
-        folderNameAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        folderNameAlert.addAction(UIAlertAction(title: "Create", style: .default, handler: { [weak self, weak folderNameAlert] _ in
-            guard let self else { return }
-            guard let alert = folderNameAlert else { return }
-            if let folderName = alert.textFields?.first?.text {
-                let allowedCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
-                let folderNameCharacterSet = CharacterSet(charactersIn: folderName)
-                if folderName.isEmpty || !allowedCharacterSet.isSuperset(of: folderNameCharacterSet) {
-                    let errorAlert = UIAlertController(title: "Ошибка", message: "Folder name contains invalid characters", preferredStyle: .alert)
-                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-                        self.showAlert()
-                    }))
-                    present(errorAlert, animated: true)
-                } else {
-                    fileManagerService.createDirectory(inParentDirectory: documentsURL, withName: folderName)
-                    updateTableView()
-                }
-            }
-        }))
-        present(folderNameAlert, animated: true)
+        tableView.reloadData()
     }
     
     private func swipeForEdit() {
@@ -104,7 +100,19 @@ class DocumentsViewController: UIViewController {
     }
     
     @IBAction func createNewFolder(_ sender: UIBarButtonItem) {
-        showAlert()
+        Alert().setName(
+            on: self,
+            title: "Create new folder",
+            message: "Enter folder name",
+            placeholder: "Folder name"
+        ) {
+            [weak self] enteredName in
+            guard let self else { return }
+            if let name = enteredName {
+                self.fileManagerService.createDirectory(inParentDirectory: self.documentsURL, withName: name)
+                self.updateTableView()
+            }
+        }
     }
     
     @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
@@ -133,12 +141,26 @@ extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DocumentsTableViewCell", for: indexPath)
         
         let content = contentOfDocuments[indexPath.row]
+        
         cell.textLabel?.text = content.name
             
         if content.type == .folder {
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = nil
         } else {
             cell.accessoryType = .none
+            if let imageName = content.imageName {
+                let imagePath = documentsURL.appending(path: imageName)
+                do {
+                    let imageData = try Data(contentsOf: imagePath)
+                    let image = UIImage(data: imageData)
+                    let imageView = UIImageView(image: image)
+                    imageView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+                    cell.accessoryView = imageView
+                } catch {
+                    print("❌", error.localizedDescription)
+                }
+            }
         }
         
         return cell
@@ -156,15 +178,20 @@ extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension DocumentsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage,
-           let imageURL = info[.imageURL] as? URL {
-            let imageName = imageURL.lastPathComponent
-            if let imageData = image.jpegData(compressionQuality: 1.0) {
-                fileManagerService.createFile(inParentDirectory: documentsURL, data: imageData, imageName: imageName)
-            }
+        picker.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            Alert().setName(
+                on: self,
+                title: "Save Image",
+                message: "Enter a name for the image",
+                placeholder: "Image name") { enteredName in
+                    guard let name = enteredName else { return }
+                    if let image = info[.originalImage] as? UIImage,
+                       let imageData = image.jpegData(compressionQuality: 1.0) {
+                        self.fileManagerService.createFile(inParentDirectory: self.documentsURL, data: imageData, imageName: name + ".jpeg")
+                        self.updateTableView()
+                    }
+                }
         }
-        updateTableView()
-        picker.dismiss(animated: true, completion: nil)
     }
 }
-

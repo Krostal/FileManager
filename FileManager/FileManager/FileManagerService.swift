@@ -16,6 +16,7 @@ struct Content {
     let name: String
     let type: ContentType
     let path: String
+    let imageName: String?
 }
 
 class FileManagerService: FileManagerServiceProtocol {
@@ -32,9 +33,9 @@ class FileManagerService: FileManagerServiceProtocol {
                     var isDirectory: ObjCBool = false
                     if fileManager.fileExists(atPath: itemURL.path(), isDirectory: &isDirectory) {
                         if isDirectory.boolValue {
-                            arrayOfContent.append(Content(name: itemURL.lastPathComponent, type: .folder, path: url.path()))
+                            arrayOfContent.append(Content(name: itemURL.lastPathComponent, type: .folder, path: url.path(), imageName: ""))
                         } else {
-                            arrayOfContent.append(Content(name: itemURL.lastPathComponent, type: .file, path: url.path()))
+                            arrayOfContent.append(Content(name: itemURL.lastPathComponent, type: .file, path: url.path(), imageName: itemURL.lastPathComponent))
                         }
                     }
                 }
