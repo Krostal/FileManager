@@ -85,35 +85,6 @@ class DocumentsViewController: UIViewController {
         tableView.reloadData()
     }
     
-    private func showFolderAlert() {
-        let folderNameAlert = UIAlertController(title: "Create new folder", message: "Enter folder name", preferredStyle: .alert)
-        
-        folderNameAlert.addTextField { textField in
-            textField.placeholder = "Folder name"
-        }
-        
-        folderNameAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        folderNameAlert.addAction(UIAlertAction(title: "Create", style: .default, handler: { [weak self, weak folderNameAlert] _ in
-            guard let self else { return }
-            guard let alert = folderNameAlert else { return }
-            if let folderName = alert.textFields?.first?.text {
-                let allowedCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
-                let folderNameCharacterSet = CharacterSet(charactersIn: folderName)
-                if folderName.isEmpty || !allowedCharacterSet.isSuperset(of: folderNameCharacterSet) {
-                    let errorAlert = UIAlertController(title: "Error", message: "Folder name contains invalid characters", preferredStyle: .alert)
-                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-                        self.showFolderAlert()
-                    }))
-                    present(errorAlert, animated: true)
-                } else {
-                    fileManagerService.createDirectory(inParentDirectory: documentsURL, withName: folderName)
-                    updateTableView()
-                }
-            }
-        }))
-        present(folderNameAlert, animated: true)
-    }
-    
     private func swipeForEdit() {
         let swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture))
         swipeGestureRecognizer.direction = .left
@@ -129,7 +100,19 @@ class DocumentsViewController: UIViewController {
     }
     
     @IBAction func createNewFolder(_ sender: UIBarButtonItem) {
-        showFolderAlert()
+        Alert().setName(
+            on: self,
+            title: "Create new folder",
+            message: "Enter folder name",
+            placeholder: "Folder name"
+        ) {
+            [weak self] enteredName in
+            guard let self else { return }
+            if let name = enteredName {
+                self.fileManagerService.createDirectory(inParentDirectory: self.documentsURL, withName: name)
+                self.updateTableView()
+            }
+        }
     }
     
     @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
@@ -182,15 +165,20 @@ extension DocumentsViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension DocumentsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage,
-           let imageURL = info[.imageURL] as? URL {
-            let imageName = imageURL.lastPathComponent
-            if let imageData = image.jpegData(compressionQuality: 1.0) {
-                fileManagerService.createFile(inParentDirectory: documentsURL, data: imageData, imageName: imageName)
-            }
+        picker.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            Alert().setName(
+                on: self,
+                title: "Save Image",
+                message: "Enter a name for the image",
+                placeholder: "Image name") { enteredName in
+                    guard let name = enteredName else { return }
+                    if let image = info[.originalImage] as? UIImage,
+                       let imageData = image.jpegData(compressionQuality: 1.0) {
+                        self.fileManagerService.createFile(inParentDirectory: self.documentsURL, data: imageData, imageName: name + ".jpeg")
+                        self.updateTableView()
+                    }
+                }
         }
-        updateTableView()
-        picker.dismiss(animated: true, completion: nil)
     }
 }
-

@@ -11,6 +11,7 @@
 		091379A42AB9940800DAC266 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091379A32AB9940800DAC266 /* SettingsViewController.swift */; };
 		091379A62AB9967F00DAC266 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091379A52AB9967F00DAC266 /* Settings.swift */; };
 		093375C32AB835D9001639F4 /* AuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093375C22AB835D9001639F4 /* AuthorizationViewController.swift */; };
+		0964E6002ABAC72500E3F036 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0964E5FF2ABAC72500E3F036 /* Alert.swift */; };
 		09A54AF52AB56D5E003331D4 /* DocumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A54AF42AB56D5D003331D4 /* DocumentsViewController.swift */; };
 		09A54AF92AB58455003331D4 /* FileManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A54AF82AB58455003331D4 /* FileManagerService.swift */; };
 		09A54AFB2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A54AFA2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift */; };
@@ -30,6 +31,7 @@
 		091379A32AB9940800DAC266 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		091379A52AB9967F00DAC266 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		093375C22AB835D9001639F4 /* AuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationViewController.swift; sourceTree = "<group>"; };
+		0964E5FF2ABAC72500E3F036 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		09A54AF42AB56D5D003331D4 /* DocumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsViewController.swift; sourceTree = "<group>"; };
 		09A54AF82AB58455003331D4 /* FileManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
 		09A54AFA2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLevelFolderViewControllerViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				09A54AF42AB56D5D003331D4 /* DocumentsViewController.swift */,
 				09A54AFA2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift */,
 				0911C28B2AB5C4C20031E9DF /* SecondLevelFolderViewController.swift */,
+				0964E5FF2ABAC72500E3F036 /* Alert.swift */,
 			);
 			path = FileManager;
 			sourceTree = "<group>";
@@ -207,6 +210,7 @@
 				0911C28C2AB5C4C20031E9DF /* SecondLevelFolderViewController.swift in Sources */,
 				09F425532AB5578C00C294D9 /* SceneDelegate.swift in Sources */,
 				09DE41DE2ABA107C004AB75B /* ChangePasswordViewController.swift in Sources */,
+				0964E6002ABAC72500E3F036 /* Alert.swift in Sources */,
 				091379A62AB9967F00DAC266 /* Settings.swift in Sources */,
 				09A54AFB2AB5C271003331D4 /* FirstLevelFolderViewControllerViewController.swift in Sources */,
 			);
